@@ -2,6 +2,11 @@
 Code for Etivity-4
 """
 class Matrix:
+    """ This class provides matrix operations such as:
+        addition, substraction, multiplication,
+        determinant, inverse, dot product.
+    """
+
     def __init__(self, matrix):
         """ init """
         self.matrix = matrix
@@ -129,19 +134,24 @@ class Matrix:
 
 
     def cross_product(self, other):
-        """ Calculate the dot product between this vector and another one. """
+        """ Calculate the dot product between this vector and another one.
+
+        QUESTION TO REVIEWING PEER:
+        ==========================
+        SHOULD WE SUPPORT MORE THAN 2 ROWS PER VECTOR?
+
+        """
 
         if (self.get_nb_cols() == other.get_nb_cols()) and (self.get_nb_cols() == 1) and (self.get_nb_rows() == 2):
-            self.log("nb of cols compatible with dot product")
             self.initialise_result_matrix(2, 2)
-
+            
             self.copy_column_into_result_matrix(self, 0)
             self.copy_column_into_result_matrix(other, 1)
 
-            M_temp = Matrix(self.result)
-            self.log("Matrix_temp:{}".format(M_temp.get_matrix()))
+            m_temp = Matrix(self.result)
+            self.log("Matrix_temp:{}".format(m_temp.get_matrix()))
 
-            return M_temp.determinant()
+            return m_temp.determinant()
 
         else:
             raise ValueError('Only 2x1 vectors are supported for now.')
@@ -198,6 +208,9 @@ def tests():
     print("M1 det     :{}".format(M1.determinant()))
     print("M1 inverse :{}".format(M1.inverse()))
 
+    assert M1.determinant() == -2
+    assert M1.inverse() == (-0.5, [[5, -3], [-4, 2]])
+
     print("")
     print("M3 matrix  :{}".format(M3.get_matrix()))
     print("M4 matrix  :{}".format(M4.get_matrix()))
@@ -205,9 +218,15 @@ def tests():
     print("M3 - M4    :{}".format(M3.add_or_subtract_matrices(M4, 'subtract')))
     print("M3 * M4    :{}".format(M3.multiply_matrices(M4)))
 
+    assert M3.add_or_subtract_matrices(M4, 'add') == [[3, 6, 6, 8], [6, 7, 7, 8], [12, 4, 6, 2], [5, 7, 7, 6]]
+    assert M3.add_or_subtract_matrices(M4, 'subtract') == [[-1, 4, -2, -2], [0, -3, 5, 2], [0, -2, 2, 0], [3, -1, -5, -2]]
+    assert M3.multiply_matrices(M4) == ((32, 44, 31, 34), (53, 51, 56, 47), (40, 27, 39, 41), (25, 30, 33, 38))
+
     print("")
     print("V1         :{}".format(V1.get_matrix()))
     print("V2         :{}".format(V2.get_matrix()))
     print("V1 X V2    :{}".format(V1.cross_product(V2)))
+
+    assert V1.cross_product(V2) == -2
 
 tests()
