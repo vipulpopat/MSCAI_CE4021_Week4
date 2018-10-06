@@ -134,37 +134,24 @@ class Matrix:
 
 
     def cross_product(self, other):
-        """ Calculate the dot product between this vector and another one.
+        """ Calculate the dot product between this 3x1 vector and another one.
 
-        QUESTION TO REVIEWING PEER:
-        ==========================
-        SHOULD WE SUPPORT MORE THAN 2 ROWS PER VECTOR?
+        This link provides a very consise definition of the dot product.
+        http://www.math.pitt.edu/~sparling/23012/*vectors5/node19.html
 
         """
 
-        if (self.get_nb_cols() == other.get_nb_cols()) and (self.get_nb_cols() == 1) and (self.get_nb_rows() == 2):
-            self.initialise_result_matrix(2, 2)
-            
-            self.copy_column_into_result_matrix(self, 0)
-            self.copy_column_into_result_matrix(other, 1)
+        if (self.get_nb_cols() == other.get_nb_cols()) and (self.get_nb_cols() == 1) and (self.get_nb_rows() == 3):
+            self.initialise_result_matrix(1, 3)
+           
+            self.result[0][0] = self.get(1,0)*other.get(2,0)-self.get(2,0)*other.get(1,0)
+            self.result[1][0] = self.get(2,0)*other.get(0,0)-self.get(0,0)*other.get(2,0)
+            self.result[2][0] = self.get(0,0)*other.get(1,0)-self.get(1,0)*other.get(0,0)            
 
-            m_temp = Matrix(self.result)
-            self.log("Matrix_temp:{}".format(m_temp.get_matrix()))
-
-            return m_temp.determinant()
+            return self.result        
 
         else:
-            raise ValueError('Only 2x1 vectors are supported for now.')
-
-
-    def copy_column_into_result_matrix(self, column_matrix, to_col_nb):
-        """ Copy the content of a column matrix into a the result matrix at the
-            given column position.
-        """
-        nb_rows = column_matrix.get_nb_rows()
-        for i in range(nb_rows):
-            self.result[i][to_col_nb] = column_matrix.get(i, 0)
-        self.log("result:{}".format(self.result))
+            raise ValueError('Only 3x1 vectors are supported for now.')
 
 
     def initialise_result_matrix(self, num_cols, num_rows):
@@ -180,9 +167,6 @@ def tests():
     m1 = [[2, 3],
           [4, 5]]
 
-    m2 = [[6, 7],
-          [8, 9]]
-
     m3 = [[1, 5, 2, 3],
           [3, 2, 6, 5],
           [6, 1, 4, 1],
@@ -193,15 +177,10 @@ def tests():
           [6, 3, 2, 1],
           [1, 4, 6, 4]]
 
-    v1 = [[1], [2]]
-    v2 = [[3], [4]]
 
     M1 = Matrix(m1)
-    M2 = Matrix(m2)
     M3 = Matrix(m3)
     M4 = Matrix(m4)
-    V1 = Matrix(v1)
-    V2 = Matrix(v2)
 
     # Ensure methods are working as expected
     print("M1 matrix  :{}".format(M1.get_matrix()))
@@ -222,11 +201,16 @@ def tests():
     assert M3.add_or_subtract_matrices(M4, 'subtract') == [[-1, 4, -2, -2], [0, -3, 5, 2], [0, -2, 2, 0], [3, -1, -5, -2]]
     assert M3.multiply_matrices(M4) == ((32, 44, 31, 34), (53, 51, 56, 47), (40, 27, 39, 41), (25, 30, 33, 38))
 
+    v = [[1], [2], [3]]
+    w = [[4], [5], [6]]
+    V = Matrix(v)
+    W = Matrix(w)
+    
     print("")
-    print("V1         :{}".format(V1.get_matrix()))
-    print("V2         :{}".format(V2.get_matrix()))
-    print("V1 X V2    :{}".format(V1.cross_product(V2)))
-
-    assert V1.cross_product(V2) == -2
+    print("V          :{}".format(V.get_matrix()))
+    print("W          :{}".format(W.get_matrix()))
+    print("V X W      :{}".format(V.cross_product(W)))
+    
+    assert V.cross_product(W) == [[-3], [6], [-3]]
 
 tests()
