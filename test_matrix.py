@@ -7,7 +7,7 @@ I have added to these tests the extra requirements for Etivitiy 4
 
 import unittest
 
-from matrix import Matrix
+from tensor import Tensor
 
 
 class TestMatrixImplementationEtivity3(unittest.TestCase):
@@ -62,31 +62,31 @@ class TestMatrixImplementationEtivity3(unittest.TestCase):
 
     def test_matrix_creation(self):
         # Checks that a matrix is created successfully with the correct dimensions and content
-        a = Matrix(self._A_2x2)
+        a = Tensor(self._A_2x2)
         self.assertEqual(a.get_order(), (2, 2))
         self.assertEqual(a.elements, self._A_2x2)
 
     def test_matrix_invalid_creation(self):
         # Checks that a matrix can't be created without a valid element list
-        self.assertRaises(TypeError, Matrix, None)
-        self.assertRaises(TypeError, Matrix, [])
-        self.assertRaises(TypeError, Matrix, self._Err_D)
-        self.assertRaises(ValueError, Matrix, self._Err_A_2x2)
-        self.assertRaises(ValueError, Matrix, self._Err_B_2x2)
-        self.assertRaises(ValueError, Matrix, self._Err_C_2x2)
+        self.assertRaises(TypeError, Tensor, None)
+        self.assertRaises(TypeError, Tensor, [])
+        self.assertRaises(TypeError, Tensor, self._Err_D)
+        self.assertRaises(ValueError, Tensor, self._Err_A_2x2)
+        self.assertRaises(ValueError, Tensor, self._Err_B_2x2)
+        self.assertRaises(ValueError, Tensor, self._Err_C_2x2)
 
     def test_matrix_add_matrices(self):
         # Checks that two same size matrices are added together correctly
-        a = Matrix(self._A_2x2)
-        b = Matrix(self._B_2x2)
+        a = Tensor(self._A_2x2)
+        b = Tensor(self._B_2x2)
         c = a + b
         expected = ((3, 7), (11, 15))
         self.assertEqual(c.elements, expected)
 
     def test_matrix_add_invalid_matrices(self):
         # Checks that two same differing size matrices can't be added or subtracted
-        a = Matrix(self._A_2x2)
-        b = Matrix(self._B_3x3)
+        a = Tensor(self._A_2x2)
+        b = Tensor(self._B_3x3)
 
         func = lambda x, y: x + y
 
@@ -96,16 +96,16 @@ class TestMatrixImplementationEtivity3(unittest.TestCase):
 
     def test_matrix_subtract_matrices(self):
         # Checks that two same size matrices are added together correctly
-        a = Matrix(self._A_2x2)
-        b = Matrix(self._B_2x2)
+        a = Tensor(self._A_2x2)
+        b = Tensor(self._B_2x2)
         c = a - b
         expected = ((-1, -1), (-1, -1))
         self.assertEqual(c.elements, expected)
 
     def test_matrix_subtract_invalid_matrices(self):
         # Checks that two same differing size matrices can't be added or subtracted
-        a = Matrix(self._A_2x2)
-        b = Matrix(self._B_3x3)
+        a = Tensor(self._A_2x2)
+        b = Tensor(self._B_3x3)
 
         func = lambda x, y: x - y
 
@@ -115,47 +115,47 @@ class TestMatrixImplementationEtivity3(unittest.TestCase):
 
     def test_matrix_multiply_by_scalar(self):
         # Checks the correct multiplication of a matrix by a scalar
-        a = Matrix(self._B_3x2)
+        a = Tensor(self._B_3x2)
         b = a * 3
         expected = ((12, 21), (9, 27), (15, 6))
         self.assertEqual(b.elements, expected)
 
     def test_matrix_multiply_by_vector(self):
         # Checks the correct multiplication of a matrix by a vector
-        a = Matrix(self._B_2x2)
-        b = Matrix(self._B_2x1)
+        a = Tensor(self._B_2x2)
+        b = Tensor(self._B_2x1)
         c = a @ b
         expected = ((8,), (20,))
         self.assertEqual(c.elements, expected)
 
     def test_matrix_multiply_same_order_matrices(self):
         # Checks that two same size matrices are multiplied together correctly
-        a = Matrix(self._A_2x2)
-        b = Matrix(self._B_2x2)
+        a = Tensor(self._A_2x2)
+        b = Tensor(self._B_2x2)
         c = a @ b
         expected = ((20, 28), (52, 76))
         self.assertEqual(c.elements, expected)
 
     def test_matrix_multiply_nonsquare_matrices(self):
         # Checks that two different size matrices are multiplied together correctly
-        a = Matrix(self._A_3x3)
-        b = Matrix(self._B_3x2)
+        a = Tensor(self._A_3x3)
+        b = Tensor(self._B_3x2)
         c = a @ b
         expected = ((25, 31), (29, 35), (78, 105))
         self.assertEqual(c.elements, expected)
 
     def test_matrix_multiply_incompatible_matrices(self):
         # Checks that matrices with incompatible dimension/order can't be multiplied
-        a = Matrix(self._A_3x3)
-        b = Matrix(self._B_3x2)
+        a = Tensor(self._A_3x3)
+        b = Tensor(self._B_3x2)
 
         func = lambda x, y: x * y
 
         self.assertRaises(TypeError, func, b, a)
 
     def test_matrix_multiply_non_numeric(self):
-        # Checks that matrices can't be multiplied by a string or non-Matrix object
-        a = Matrix(self._A_2x2)
+        # Checks that matrices can't be multiplied by a string or non-Tensor object
+        a = Tensor(self._A_2x2)
 
         func = lambda x, y: x * y
 
@@ -165,10 +165,10 @@ class TestMatrixImplementationEtivity3(unittest.TestCase):
 
     def test_matrix_equality(self):
         # Check that matrix equality rules are correct
-        a = Matrix(self._A_2x2)
-        b = Matrix(self._B_2x2)
-        c = Matrix([[1, 3], [5, 7]])
-        d = Matrix(self._A_3x3)
+        a = Tensor(self._A_2x2)
+        b = Tensor(self._B_2x2)
+        c = Tensor([[1, 3], [5, 7]])
+        d = Tensor(self._A_3x3)
 
         self.assertTrue(a != b)
         self.assertTrue(a == c)
@@ -187,49 +187,49 @@ class TestMatrixImplementationEtivity3(unittest.TestCase):
     #   - Cross-product of 2 suitable tensors
 
     def test_sum_4_by_4_matrix(self):
-        a = Matrix([[2, 3, 2, 9], [8, 3, 1, 7], [4, 1, 9, 5], [2, 4, 0, 9]])
-        b = Matrix([[2, 3, 5, 2], [1, 9, 1, 7], [6, 3, 9, 4], [5, 2, 4, 7]])
-        expected_result = Matrix([[4, 6, 7, 11], [9, 12, 2, 14], [10, 4, 18, 9], [7, 6, 4, 16]])
+        a = Tensor([[2, 3, 2, 9], [8, 3, 1, 7], [4, 1, 9, 5], [2, 4, 0, 9]])
+        b = Tensor([[2, 3, 5, 2], [1, 9, 1, 7], [6, 3, 9, 4], [5, 2, 4, 7]])
+        expected_result = Tensor([[4, 6, 7, 11], [9, 12, 2, 14], [10, 4, 18, 9], [7, 6, 4, 16]])
 
         result = a + b
 
         self.assertEqual(result, expected_result)
 
     def test_multiply_4_by_4_matrix(self):
-        a = Matrix([[2, 3, 2, 9], [8, 3, 1, 7], [4, 1, 9, 5], [2, 4, 0, 9]])
-        b = Matrix([[2, 3, 5, 2], [1, 9, 1, 7], [6, 3, 9, 4], [5, 2, 4, 7]])
-        expected_result = Matrix([[64, 57, 67, 96], [60, 68, 80, 90], [88, 58, 122, 86], [53, 60, 50, 95]])
+        a = Tensor([[2, 3, 2, 9], [8, 3, 1, 7], [4, 1, 9, 5], [2, 4, 0, 9]])
+        b = Tensor([[2, 3, 5, 2], [1, 9, 1, 7], [6, 3, 9, 4], [5, 2, 4, 7]])
+        expected_result = Tensor([[64, 57, 67, 96], [60, 68, 80, 90], [88, 58, 122, 86], [53, 60, 50, 95]])
 
         result = a @ b
 
         self.assertEqual(result, expected_result)
 
     def test_scalar_multiplication_4_by_4(self):
-        a = Matrix([[2, 3, 2, 9], [8, 3, 1, 7], [4, 1, 9, 5], [2, 4, 0, 9]])
-        v = Matrix([[2], [1], [6], [5]])
-        expected_result = Matrix([[64], [60], [88], [53]])
+        a = Tensor([[2, 3, 2, 9], [8, 3, 1, 7], [4, 1, 9, 5], [2, 4, 0, 9]])
+        v = Tensor([[2], [1], [6], [5]])
+        expected_result = Tensor([[64], [60], [88], [53]])
 
         result = a @ v
 
         self.assertEqual(result, expected_result)
 
     def test_matrix_determinent(self):
-        a = Matrix(self._A_2x2)
-        det_a = a._determinant()
+        a = Tensor(self._A_2x2)
+        det_a = a.determinant()
         expected_det = -8
         self.assertEqual(expected_det, det_a)
 
     def test_matrix_inverse(self):
-        c = Matrix(self._C_2x2)
-        inverse_c = c._inverse()
-        expected_inverse = Matrix([(0.6, -0.7), (-0.2, 0.4)])
+        c = Tensor(self._C_2x2)
+        inverse_c = c.inverse()
+        expected_inverse = Tensor([(0.6, -0.7), (-0.2, 0.4)])
 
         self.assertEqual(expected_inverse, inverse_c)
 
     def test_matrix_cross_product(self):
-        vector_e = Matrix(self._E_vector)
-        vector_f = Matrix(self._F_vector)
-        expected_cross_product = Matrix(([-1], [-4], [3]))
-        actual_cross_product = vector_e._cross_product(vector_f)
+        vector_e = Tensor(self._E_vector)
+        vector_f = Tensor(self._F_vector)
+        expected_cross_product = Tensor(([-1], [-4], [3]))
+        actual_cross_product = vector_e.cross_product(vector_f)
 
         self.assertEqual(expected_cross_product, actual_cross_product)
