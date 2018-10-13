@@ -13,15 +13,14 @@ class Matrix:
         self.debug = False
 
 
-    def set_debug(self, debug):
-        """ Progrmmatically turn on debug logging. """
-        self.debug = debug
-
-
-    def log(self, message):
+    def __log__(self, message):
         """ Print a message on screen when debug is turned on. """
         if self.debug:
             print(message)
+
+
+    def __str__(self):
+        return str(self.get_matrix())
 
 
     def get_matrix(self):
@@ -53,29 +52,30 @@ class Matrix:
         """ Return the number of columns of the underlying 2D array. """
         return self.get_size()[1]
 
-    def add(self, other_matrix, operation):
+    def add(self, other_matrix):
         """ Perform addition. Delegate work to Gerry's original method """
         return self.__add_or_subtract_matrices__(other_matrix, "add")
 
 
-    def subtract(self, other_matrix, operation):
+    def subtract(self, other_matrix):
         """ Perform Subtraction. Delegate work to Gerry's original method """
         return self.__add_or_subtract_matrices__(other_matrix, "subtract")
+
 
     def __add_or_subtract_matrices__(self, other_matrix, operation):
         """ Perform addition or substraction of this matrix with another. """
         nb_rows, nb_cols = self.get_size()
-        self.__initialise_result_matrix__(nb_rows, nb_cols)
+        result = self.__init_empty_matrix__(nb_rows, nb_cols)
 
         # check if matrices are the same shape
         if self.get_size() == other_matrix.get_size():
             for i in range(len(self.matrix)):
                 for j in range(len(self.matrix[0])):
                     if operation == 'add':
-                        self.result[i][j] = self.matrix[i][j] + other_matrix.get(i, j)
+                        result[i][j] = self.matrix[i][j] + other_matrix.get(i, j)
                     elif operation == 'subtract':
-                        self.result[i][j] = self.matrix[i][j] - other_matrix.get(i, j)
-            return Matrix(self.result)
+                        result[i][j] = self.matrix[i][j] - other_matrix.get(i, j)
+            return Matrix(result)
         else:
             raise ValueError('Matrices not compatible with addition/substraction.')
 
@@ -99,7 +99,6 @@ class Matrix:
             raise ValueError('Matrices not compatible with multiplication.')
 
 
-
     def determinant(self):
         """ Calculate the determinant of a 2x2 matrix
 
@@ -111,7 +110,7 @@ class Matrix:
 
         rows, cols = self.get_size()
         if rows == 2 and cols == 2:
-            self.log("Calculating determinant for matrix:{}".format(self.matrix))
+            self.__log__("Calculating determinant for matrix:{}".format(self.matrix))
             return self.matrix[0][0]*self.matrix[1][1]-self.matrix[1][0]*self.matrix[0][1]
         else:
             raise ValueError('Only 2x2 matrices are supported for now.')
@@ -128,20 +127,20 @@ class Matrix:
                                [-b,a]]
         """
         rows, cols = self.get_size()
-        self.__initialise_result_matrix__(cols, rows)
+        result = self.__init_empty_matrix__(cols, rows)
 
         det = self.determinant()
         if det == 0:
             return None
 
         if rows == 2 and cols == 2:
-            self.log("Calculating inverse of matrix:{}".format(self.matrix))
-            self.result[0][0] = self.matrix[1][1] / det
-            self.result[0][1] = (0 - self.matrix[0][1]) / det
-            self.result[1][0] = (0 - self.matrix[1][0]) / det
-            self.result[1][1] = self.matrix[0][0] /  det
+            self.__log__("Calculating inverse of matrix:{}".format(self.matrix))
+            result[0][0] = self.matrix[1][1] / det
+            result[0][1] = (0 - self.matrix[0][1]) / det
+            result[1][0] = (0 - self.matrix[1][0]) / det
+            result[1][1] = self.matrix[0][0] /  det
 
-            return Matrix(self.result)
+            return Matrix(result)
         else:
             raise ValueError('Only 2x2 matrices are supported for now.')
 
@@ -154,24 +153,26 @@ class Matrix:
 
         """
 
-        if (self.get_nb_cols() == other.get_nb_cols()) and (self.get_nb_cols() == 1) and (self.get_nb_rows() == 3):
-            self.__initialise_result_matrix__(1, 3)
+        if (self.get_nb_cols() == other.get_nb_cols()) and \
+            (self.get_nb_cols() == 1) and \
+            (self.get_nb_rows() == 3):
 
-            self.result[0][0] = self.get(1, 0)*other.get(2, 0)-self.get(2, 0)*other.get(1, 0)
-            self.result[1][0] = self.get(2, 0)*other.get(0, 0)-self.get(0, 0)*other.get(2, 0)
-            self.result[2][0] = self.get(0, 0)*other.get(1, 0)-self.get(1, 0)*other.get(0, 0)
+            result = self.__init_empty_matrix__(1, 3)
 
-            return Matrix(self.result)
+            result[0][0] = self.get(1, 0)*other.get(2, 0)-self.get(2, 0)*other.get(1, 0)
+            result[1][0] = self.get(2, 0)*other.get(0, 0)-self.get(0, 0)*other.get(2, 0)
+            result[2][0] = self.get(0, 0)*other.get(1, 0)-self.get(1, 0)*other.get(0, 0)
+
+            return Matrix(result)
 
         else:
             raise ValueError('Only 3x1 vectors are supported for now.')
 
 
-    def __initialise_result_matrix__(self, num_cols, num_rows):
-        """ Initialise an empty matrix. """
-        self.result = [[0 for x in range(num_cols)]
-                        for y in range(num_rows)]
-        return self.result
+    def __init_empty_matrix__(self, num_cols, num_rows):
+        new_matrix = [[0 for x in range(num_cols)] \
+                       for y in range(num_rows)]
+        return new_matrix
 
 
     def __compare_floats__(self, left_float, right_float):
@@ -196,20 +197,20 @@ class Matrix:
 def tests():
     """ Test suite """
     m_0 = [[1, 1],
-          [1, 1]]
+           [1, 1]]
 
     m_1 = [[2, 3],
-          [4, 5]]
+           [4, 5]]
 
     m_3 = [[1, 5, 2, 3],
-          [3, 2, 6, 5],
-          [6, 1, 4, 1],
-          [4, 3, 1, 2]]
+           [3, 2, 6, 5],
+           [6, 1, 4, 1],
+           [4, 3, 1, 2]]
 
     m_4 = [[2, 1, 4, 5],
-          [3, 5, 1, 3],
-          [6, 3, 2, 1],
-          [1, 4, 6, 4]]
+           [3, 5, 1, 3],
+           [6, 3, 2, 1],
+           [1, 4, 6, 4]]
 
 
     M_0 = Matrix(m_0)
@@ -224,6 +225,11 @@ def tests():
 
     assert M_0.determinant() == 0
     assert M_0.inverse() == None
+
+    # Showing the fluent pattern at work
+    print("M_0 added to itself 3 times :{}".format(M_0.add(M_0).add(M_0)))
+
+    assert M_0.add(M_0).add(M_0).equals(Matrix([[3, 3], [3, 3]]))
     print("")
 
     print("M_1 matrix  :{}".format(M_1.get_matrix()))
@@ -234,14 +240,14 @@ def tests():
     assert M_1.inverse().equals(Matrix([[-2.5, 1.5], [2, -1]]))
 
     print("")
-    print("M_3 matrix   :{}".format(M_3.get_matrix()))
-    print("M_4 matrix   :{}".format(M_4.get_matrix()))
-    print("M_3 + M_4    :{}".format(M_3.add(M_4, 'add').get_matrix()))
-    print("M_3 - M_4    :{}".format(M_3.subtract(M_4, 'subtract').get_matrix()))
-    print("M_3 * M_4    :{}".format(M_3.multiply(M_4).get_matrix()))
+    print("M_3 matrix   :{}".format(M_3))
+    print("M_4 matrix   :{}".format(M_4))
+    print("M_3 + M_4    :{}".format(M_3.add(M_4)))
+    print("M_3 - M_4    :{}".format(M_3.subtract(M_4)))
+    print("M_3 * M_4    :{}".format(M_3.multiply(M_4)))
 
-    assert M_3.add(M_4, 'add').equals(Matrix([[3, 6, 6, 8], [6, 7, 7, 8], [12, 4, 6, 2], [5, 7, 7, 6]]))
-    assert M_3.subtract(M_4, 'subtract').equals(Matrix([[-1, 4, -2, -2], [0, -3, 5, 2], [0, -2, 2, 0], [3, -1, -5, -2]]))
+    assert M_3.add(M_4).equals(Matrix([[3, 6, 6, 8], [6, 7, 7, 8], [12, 4, 6, 2], [5, 7, 7, 6]]))
+    assert M_3.subtract(M_4,).equals(Matrix([[-1, 4, -2, -2], [0, -3, 5, 2], [0, -2, 2, 0], [3, -1, -5, -2]]))
     assert M_3.multiply(M_4).equals(Matrix([[32, 44, 31, 34], [53, 51, 56, 47], [40, 27, 39, 41], [25, 30, 33, 38]]))
 
 
@@ -253,8 +259,9 @@ def tests():
     print("")
     print("V          :{}".format(V.get_matrix()))
     print("W          :{}".format(W.get_matrix()))
-    print("V X W      :{}".format(V.cross_product(W).get_matrix()))
+    print("V X W      :{}".format(V.cross_product(W)))
 
     assert V.cross_product(W).equals(Matrix([[-3], [6], [-3]]))
+    
 
 tests()
